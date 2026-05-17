@@ -1,15 +1,15 @@
 {
-  "policies": {
+  "configurations": {
     "ssn": {
       "engine": "ff1",
       "key_ref": "test-key",
-      "tag": "T01"
+      "header": "T01"
     },
     "name": {
       "engine": "ff1",
       "alphabet": "alpha_lower",
       "key_ref": "test-key",
-      "tag": "T03"
+      "header": "T03"
     }
   },
   "keys": {
