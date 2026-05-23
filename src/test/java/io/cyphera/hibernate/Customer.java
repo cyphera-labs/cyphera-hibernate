@@ -14,7 +14,7 @@ public class Customer {
 
     private String name;
 
-    @Type(value = CypheraType.class, parameters = @Parameter(name = "policy", value = "ssn"))
+    @Type(value = CypheraType.class, parameters = @Parameter(name = "configuration", value = "ssn"))
     private String ssn;
 
     private String email;

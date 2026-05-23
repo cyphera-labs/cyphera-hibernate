@@ -54,18 +54,18 @@ mvn package -DskipTests
 ## Install / Deploy
 
 1. Add the Maven dependency
-2. Place `cyphera.json` on classpath or at `/etc/cyphera/cyphera.json` (or set `CYPHERA_POLICY_FILE` env var)
-3. Annotate fields with `@CypheraProtect("policy_name")`
+2. Place `cyphera.json` on classpath or at `/etc/cyphera/cyphera.json` (or set `CYPHERA_CONFIGURATION_FILE` env var)
+3. Annotate fields with `@CypheraProtect("configuration_name")`
 4. Done — the Integrator handles the rest via `META-INF/services` auto-discovery
 
 ### Column Sizing
 
-Tags add 3 characters. Ensure your columns have room: **existing width + 3**. Or set `tag_enabled: false` in the policy for same-length output.
+Headers add 3 characters. Ensure your columns have room: **existing width + 3**. Or set `header_enabled: false` in the configuration for same-length output.
 
 ## How It Works
 
 1. **Boot**: `CypheraIntegrator` auto-discovered via `META-INF/services`. Registers event listeners.
-2. **Scan**: On first access, scans entity fields for `@CypheraProtect` and caches field→policy mapping.
+2. **Scan**: On first access, scans entity fields for `@CypheraProtect` and caches field→configuration mapping.
 3. **Write**: PreInsert/PreUpdate modify the Hibernate state array — database gets ciphertext, entity keeps plaintext.
 4. **Read**: PostLoad decrypts fields on the entity after loading.
 5. **SDK**: `CypheraHolder` auto-discovers `cyphera.json` if not explicitly configured.
@@ -75,7 +75,7 @@ Tags add 3 characters. Ensure your columns have room: **existing width + 3**. Or
 ### Explicit `@Type` (full Hibernate control)
 
 ```java
-@Type(value = CypheraType.class, parameters = @Parameter(name = "policy", value = "ssn"))
+@Type(value = CypheraType.class, parameters = @Parameter(name = "configuration", value = "ssn"))
 private String ssn;
 ```
 
@@ -90,25 +90,25 @@ public class SsnConverter extends io.cyphera.hibernate.compat.CypheraConverter {
 
 ## Operations
 
-### Policy Configuration
+### Configuration
 
-- Auto-discover: `CYPHERA_POLICY_FILE` env → `./cyphera.json` → `/etc/cyphera/cyphera.json`
+- Auto-discover: `CYPHERA_CONFIGURATION_FILE` env → `./cyphera.json` → `/etc/cyphera/cyphera.json`
 - Explicit: `CypheraHolder.set(Cyphera.fromFile("path"))` at bootstrap
 - Spring Boot: auto-config handles it (if cyphera-spring is also on classpath)
 
 ### Troubleshooting
 
-- **"Unknown policy"** — `@CypheraProtect("...")` doesn't match `cyphera.json`
+- **"Unknown configuration"** — `@CypheraProtect("...")` doesn't match `cyphera.json`
 - **Integrator not loading** — check `META-INF/services` is in the JAR
-- **No policy file** — ensure `cyphera.json` exists at one of the auto-discover locations
+- **No configuration file** — ensure `cyphera.json` exists at one of the auto-discover locations
 
-## Policy File
+## Configuration File
 
 ```json
 {
-  "policies": {
-    "ssn": { "engine": "ff1", "key_ref": "my-key", "tag": "T01" },
-    "credit_card": { "engine": "ff1", "key_ref": "my-key", "tag": "T02" }
+  "configurations": {
+    "ssn": { "engine": "ff1", "key_ref": "my-key", "header": "T01" },
+    "credit_card": { "engine": "ff1", "key_ref": "my-key", "header": "T02" }
   },
   "keys": {
     "my-key": { "material": "2B7E151628AED2A6ABF7158809CF4F3C" }
@@ -118,7 +118,7 @@ public class SsnConverter extends io.cyphera.hibernate.compat.CypheraConverter {
 
 ## Future
 
-- SPI extension points: custom PolicyResolver, FieldProcessor, MetadataResolver
+- SPI extension points: custom ConfigurationResolver, FieldProcessor, MetadataResolver
 - Spring Boot auto-configuration for CypheraHolder
 - Hibernate 5 `@TypeDef` compatibility
 - Audit logging integration

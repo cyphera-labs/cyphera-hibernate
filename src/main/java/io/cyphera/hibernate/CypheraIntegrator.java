@@ -56,7 +56,7 @@ public class CypheraIntegrator implements Integrator {
      */
     static class CypheraFieldListener implements PreInsertEventListener, PreUpdateEventListener, PostLoadEventListener {
 
-        // Cache: entity class → (property index → policy name)
+        // Cache: entity class → (property index → configuration name)
         private final Map<String, Map<Integer, String>> fieldCache = new ConcurrentHashMap<>();
 
         @Override
@@ -133,7 +133,7 @@ public class CypheraIntegrator implements Integrator {
                         if (annotation != null) {
                             map.put(i, annotation.value());
                             LOG.info("Cyphera: " + entityClass.getSimpleName() + "." + propertyNames[i]
-                                    + " → policy '" + annotation.value() + "'");
+                                    + " → configuration '" + annotation.value() + "'");
                         }
                     }
                 }

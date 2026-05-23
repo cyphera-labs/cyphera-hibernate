@@ -38,13 +38,13 @@ public final class CypheraHolder {
     /**
      * Get the Cyphera instance.
      * Auto-discovers via Cyphera.load() if not explicitly set.
-     * Fails fast with a clear error if no policy file found.
+     * Fails fast with a clear error if no configuration file found.
      */
     public static Cyphera get() {
         if (instance == null) {
             synchronized (CypheraHolder.class) {
                 if (instance == null) {
-                    LOG.info("CypheraHolder not explicitly set — auto-discovering policy file");
+                    LOG.info("CypheraHolder not explicitly set — auto-discovering configuration file");
                     instance = Cyphera.load();
                     LOG.info("CypheraHolder initialized (auto-discover)");
                 }

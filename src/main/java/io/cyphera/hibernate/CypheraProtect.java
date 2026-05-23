@@ -23,13 +23,13 @@ import java.lang.annotation.Target;
  *       private String creditCard;
  *   }
  *
- * The value is the Cyphera policy name as defined in cyphera.json.
+ * The value is the Cyphera configuration name as defined in cyphera.json.
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CypheraProtect {
     /**
-     * The Cyphera policy name (e.g. "ssn", "credit_card", "phone").
+     * The Cyphera configuration name (e.g. "ssn", "credit_card", "phone").
      */
     String value();
 }

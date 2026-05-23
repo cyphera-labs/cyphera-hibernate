@@ -16,27 +16,31 @@ import java.util.Properties;
 /**
  * Hibernate UserType that provides transparent format-preserving encryption.
  *
- * On write: protects the value using the configured Cyphera policy.
- * On read: accesses (decrypts) the value using the embedded tag.
+ * On write: protects the value using the configured Cyphera configuration.
+ * On read: accesses (decrypts) the value using the embedded header.
  * Dirty checking works correctly — Hibernate snapshots the plaintext Java value.
  *
  * Phase 1 usage (explicit @Type):
- *   @Type(value = CypheraType.class, parameters = @Parameter(name = "policy", value = "ssn"))
+ *   @Type(value = CypheraType.class, parameters = @Parameter(name = "configuration", value = "ssn"))
  *   private String ssn;
  *
- * Phase 2 usage (coming — clean @Cyphera annotation):
- *   @Cyphera(policy = "ssn")
+ * Phase 2 usage (preferred — clean @CypheraProtect annotation):
+ *   @CypheraProtect("ssn")
  *   private String ssn;
  */
 public class CypheraType implements UserType<String>, ParameterizedType {
 
-    private String policyName;
+    private String configurationName;
 
     @Override
     public void setParameterValues(Properties parameters) {
-        this.policyName = parameters.getProperty("policy");
-        if (policyName == null || policyName.isEmpty()) {
-            throw new IllegalArgumentException("CypheraType requires 'policy' parameter");
+        // Accept either "configuration" (new) or "policy" (legacy) for back-compat
+        this.configurationName = parameters.getProperty("configuration");
+        if (configurationName == null || configurationName.isEmpty()) {
+            this.configurationName = parameters.getProperty("policy");
+        }
+        if (configurationName == null || configurationName.isEmpty()) {
+            throw new IllegalArgumentException("CypheraType requires 'configuration' parameter");
         }
     }
 
@@ -55,7 +59,7 @@ public class CypheraType implements UserType<String>, ParameterizedType {
             st.setNull(index, Types.VARCHAR);
             return;
         }
-        st.setString(index, CypheraHolder.get().protect(value, policyName));
+        st.setString(index, CypheraHolder.get().protect(value, configurationName));
     }
 
     @Override

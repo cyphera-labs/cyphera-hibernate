@@ -17,9 +17,9 @@ class CypheraHibernateTest {
 
     @BeforeAll
     static void setup() {
-        // Point CypheraHolder to test policy file
-        String policyPath = CypheraHibernateTest.class.getClassLoader().getResource("cyphera.json").getPath();
-        io.cyphera.Cyphera cyphera = io.cyphera.Cyphera.fromFile(policyPath);
+        // Point CypheraHolder to test configuration file
+        String configurationPath = CypheraHibernateTest.class.getClassLoader().getResource("cyphera.json").getPath();
+        io.cyphera.Cyphera cyphera = io.cyphera.Cyphera.fromFile(configurationPath);
         CypheraHolder.set(cyphera);
 
         Configuration cfg = new Configuration();
@@ -80,7 +80,7 @@ class CypheraHibernateTest {
         conn.close();
 
         assertNotEquals("987-65-4321", rawSsn, "Raw DB value should NOT be plaintext");
-        assertTrue(rawSsn.startsWith("T01"), "Raw DB value should have tag T01, got: " + rawSsn);
+        assertTrue(rawSsn.startsWith("T01"), "Raw DB value should have header T01, got: " + rawSsn);
         assertTrue(rawSsn.contains("-"), "Dashes should be preserved in encrypted value");
     }
 
